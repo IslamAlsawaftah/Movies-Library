@@ -7,6 +7,8 @@ const movieData = require("./MovieData/data.json");
 const dotenv = require("dotenv");
 // Get axios so we can send HTTP requests to an API
 const axios = require("axios");
+// It will connect the database with the server
+const pg = require("pg");
 
 // start(configure) the dotenv
 dotenv.config();
@@ -17,6 +19,10 @@ const app = express();
 const APIKEY = process.env.APIKEY;
 console.log(APIKEY)
 const PORT = process.env.PORT;
+const DATABASE_URL = process.env.DATABASE_URL;
+
+// Initialize the connection
+const client = new pg.Client(DATABASE_URL);
 
 // Constructor to format the data as I want 
 function Data(id, title, release_date, poster_path, overview) {
@@ -26,13 +32,18 @@ function Data(id, title, release_date, poster_path, overview) {
     this.poster_path = poster_path
     this.overview = overview
 };
+
+// To get the data from the body object
+app.use(express.json());
 // All my end points note: not found end point always should be in the end.
-//app.get('/', dataHandler);
-//app.get('/favorite', welcomeHandler);
 app.get('/trending', trendingHandler)
 app.get('/search', searchTrendingHandler)
 app.get('/lang', langTrendingHandler)
 app.get('/list', movielistTrendingHandler)
+app.post('/addMovie', addMovieHandler)
+app.get('/getMovies', getMoviesHandler)
+
+
 app.use("*", notFoundHandler);
 //Make my server use errorHandler function
 app.use(errorHandler);
@@ -85,6 +96,7 @@ function langTrendingHandler(req, res) {
     const lan = req.query.data
     let results = [];
     // postman link http://localhost:3000/lang?data=pt-BR
+    // query data: key=>data value=>pt-BR
     axios.get(`https://api.themoviedb.org/3/configuration/languages?api_key=${APIKEY}&language=${lan}`)
         .then(apiResponse => {
             console.log(apiResponse)
@@ -116,6 +128,26 @@ function movielistTrendingHandler(req, res) {
         })
 }
 
+function addMovieHandler(req, res) {
+    const movie = req.body;
+    const sql = `INSERT INTO addmovies(id,title, release_date, poster_path, overview) VALUES($1, $2, $3, $4,$5) RETURNING *` //returning is what data i want to return
+    const values = [movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview]
+    client.query(sql, values).then((result) => {
+        return res.status(201).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res);
+    });
+};
+
+function getMoviesHandler(req, res) {
+    const sql = `SELECT * FROM addmovies`;
+    client.query(sql).then((result) => {
+        return res.status(200).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res);
+    });
+};
+
 function errorHandler(error, req, res) {
     const err = {
         status: 500,
@@ -129,7 +161,12 @@ function notFoundHandler(req, res) {
 }
 
 // The pice of code which make my server work.
-app.listen(PORT, () => {
-    console.log(`Listen on ${PORT}`);
-});
+client.connect()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Listen on ${PORT}`);
+            // app.listen(PORT, () => {
+            //     console.log(`Listen on ${PORT}`);
+        });
 
+    });

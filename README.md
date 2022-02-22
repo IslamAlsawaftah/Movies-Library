@@ -58,4 +58,26 @@ this project will take a request and return response
 
 11- We created new end point that take the parameter from the URl where we found it inside req.query
 
+## Start Working with database
+
+1- Install PostgreSQL
+
+2- I run mt postgres server (sqlstart)
+
+3- psql then create a database (CREATE DATABASE name-of-the-database)
+
+4- npm install pg
+
+5- Create the database URL
+
+6- Do the configurations for pg (require, new pg.Client, clint.connect)
+
+7- End the take a post request
+
+8- app.use(express.json()) (top of the all end points)
+
+9- build the function that insert in database
+
+10- build a function that get from the database
+
 ## Project Features

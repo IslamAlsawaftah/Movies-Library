@@ -2,8 +2,9 @@ DROP TABLE IF EXISTS addmovies;
 
 CREATE TABLE IF NOT EXISTS addmovies(
 id SERIAL PRIMARY KEY,
-title VARCHAR(255),
-release_date VARCHAR(500),
-poster_path VARCHAR(500),
-overview VARCHAR(500)
+title VARCHAR(2000),
+release_date VARCHAR(2000),
+poster_path VARCHAR(2000),
+overview VARCHAR(2000),
+comments VARCHAR(2000)
 );

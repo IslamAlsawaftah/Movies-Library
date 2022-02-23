@@ -25,12 +25,13 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const client = new pg.Client(DATABASE_URL);
 
 // Constructor to format the data as I want 
-function Data(id, title, release_date, poster_path, overview) {
+function Data(id, title, release_date, poster_path, overview, comments) {
     this.id = id
     this.title = title
     this.release_date = release_date
     this.poster_path = poster_path
     this.overview = overview
+    this.comments = comments
 };
 
 // To get the data from the body object
@@ -130,8 +131,8 @@ function movielistTrendingHandler(req, res) {
 
 function addMovieHandler(req, res) {
     const movie = req.body;
-    const sql = `INSERT INTO addmovies(id,title, release_date, poster_path, overview) VALUES($1, $2, $3, $4,$5) RETURNING *` //returning is what data i want to return
-    const values = [movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview]
+    const sql = `INSERT INTO addmovies(title, release_date, poster_path, overview,comments) VALUES($1, $2, $3, $4,$5) RETURNING *` //returning is what data i want to return
+    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview, movie.comments]
     client.query(sql, values).then((result) => {
         return res.status(201).json(result.rows);
     }).catch((error) => {

@@ -43,7 +43,9 @@ app.get('/lang', langTrendingHandler)
 app.get('/list', movielistTrendingHandler)
 app.post('/addMovie', addMovieHandler)
 app.get('/getMovies', getMoviesHandler)
-
+app.put('/updateMovies/:id', updateMoviesHandler);
+app.delete('/deleteMovies/:id', deleteMoviesHandler);
+app.get('/getMovie/:id', getMovieHandler)
 
 app.use("*", notFoundHandler);
 //Make my server use errorHandler function
@@ -142,6 +144,40 @@ function addMovieHandler(req, res) {
 
 function getMoviesHandler(req, res) {
     const sql = `SELECT * FROM addmovies`;
+    client.query(sql).then((result) => {
+        return res.status(200).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res);
+    });
+};
+//postman link with put request http://localhost:3001/updateMovies/hi pretty
+function updateMoviesHandler(req, res) {
+    const id = req.params.id;
+    const movie = req.body;
+    const sql = `UPDATE addmovies SET title=$1, release_date=$2,poster_path=$3, overview=$4,comments=$5 WHERE id=$6 RETURNING *;`;
+    const values = [movie.title, movie.release_date, movie.poster_path, movie.overview, movie.comments, id];
+    client.query(sql, values).then((result) => {
+        return res.status(200).json(result.rows);
+    }).catch((error) => {
+        errorHandler(error, req, res);
+    });
+};
+function deleteMoviesHandler(req, res) {
+    const id = req.params.id
+
+    const sql = `DELETE FROM addmovies WHERE id=$1;`
+    const values = [id];
+
+    client.query(sql, values).then(() => {
+        return res.status(204).json({})
+    }).catch(error => {
+        errorHandler(error, req, res);
+    })
+};
+function getMovieHandler(req, res) {
+    let id = req.params.id;
+    const sql = `SELECT * FROM addmovies WHERE id=$1`;
+    const values = [id];
     client.query(sql).then((result) => {
         return res.status(200).json(result.rows);
     }).catch((error) => {

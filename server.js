@@ -43,9 +43,9 @@ app.get('/lang', langTrendingHandler)
 app.get('/list', movielistTrendingHandler)
 app.post('/addMovie', addMovieHandler)
 app.get('/getMovies', getMoviesHandler)
+app.get('/getMovie/:id', getMovieHandler)
 app.put('/updateMovies/:id', updateMoviesHandler);
 app.delete('/deleteMovies/:id', deleteMoviesHandler);
-app.get('/getMovie/:id', getMovieHandler)
 
 app.use("*", notFoundHandler);
 //Make my server use errorHandler function
@@ -176,9 +176,9 @@ function deleteMoviesHandler(req, res) {
 };
 function getMovieHandler(req, res) {
     let id = req.params.id;
-    const sql = `SELECT * FROM addmovies WHERE id=$1`;
+    const sql = `SELECT * FROM addmovies WHERE id=$1;`;
     const values = [id];
-    client.query(sql).then((result) => {
+    client.query(sql, values).then((result) => {
         return res.status(200).json(result.rows);
     }).catch((error) => {
         errorHandler(error, req, res);

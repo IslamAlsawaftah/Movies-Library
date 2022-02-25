@@ -21,8 +21,14 @@ console.log(APIKEY)
 const PORT = process.env.PORT;
 const DATABASE_URL = process.env.DATABASE_URL;
 
-// Initialize the connection
-const client = new pg.Client(DATABASE_URL);
+// Initialize the connection when i work locally
+//const client = new pg.Client(DATABASE_URL);
+
+// Initialize the connection when i work online
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 // Constructor to format the data as I want 
 function Data(id, title, release_date, poster_path, overview, comments) {

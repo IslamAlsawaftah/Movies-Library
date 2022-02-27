@@ -43,6 +43,7 @@ function Data(id, title, release_date, poster_path, overview, comments) {
 // To get the data from the body object
 app.use(express.json());
 // All my end points note: not found end point always should be in the end.
+app.get('/', dataHandler);
 app.get('/trending', trendingHandler)
 app.get('/search', searchTrendingHandler)
 app.get('/lang', langTrendingHandler)
@@ -56,7 +57,14 @@ app.delete('/deleteMovies/:id', deleteMoviesHandler);
 app.use("*", notFoundHandler);
 //Make my server use errorHandler function
 app.use(errorHandler);
-
+function dataHandler(req, res) {
+    let result = [];
+    movieData.data.forEach((value) => {
+        let oneData = new Data(value.title, value.poster_path, value.overview);
+        result.push(oneData);
+    });
+    return res.status(200).json(result);
+};
 function trendingHandler(req, res) {
     let result = [];
     // line 37 to line 45 is a promise 

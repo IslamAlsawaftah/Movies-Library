@@ -1,6 +1,8 @@
 'use strict';
 // Get express from node model
 const express = require("express");
+
+const cors = require("cors");
 // read data from JSON file
 const movieData = require("./MovieData/data.json");
 // Read .env file
@@ -14,6 +16,8 @@ const pg = require("pg");
 dotenv.config();
 // initializing my server
 const app = express();
+// to prevent cors error in front end side when we connect front with back
+app.use(cors()); // it should be written before any end point
 
 // Variables that live in my .env file
 const APIKEY = process.env.APIKEY;
@@ -22,7 +26,7 @@ const PORT = process.env.PORT;
 const DATABASE_URL = process.env.DATABASE_URL;
 
 // Initialize the connection when i work locally
-//const client = new pg.Client(DATABASE_URL);
+// const client = new pg.Client(DATABASE_URL);
 
 // Initialize the connection when i work online
 const client = new pg.Client({
